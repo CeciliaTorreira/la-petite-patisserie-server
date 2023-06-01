@@ -5,3 +5,8 @@ router.get("/", (req, res, next) => {
 });
 
 module.exports = router;
+
+// RUTAS AUTH
+
+const authRouter = require("./auth.routes.js")
+router.use("/auth", authRouter);
