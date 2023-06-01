@@ -14,7 +14,7 @@ router.post("/signup", async (req, res, next) => {
 
   const { username, email, password } = req.body;
 
-  // Validaciones del servidor
+  // Validaciones de que todos los campos estén llenos
 
   if (username === "" || email === "" || password === "") {
     res.status(400).json({ errorMessage: "All fields are required." }); // *Funciona
@@ -36,42 +36,71 @@ router.post("/signup", async (req, res, next) => {
 
   // Validación de email (varios usuarios podrán tener un nombre repetido pero los emails deben ser únicos), tras esta última validación se creará la cuenta si cumple todas las condiciones.
 
- 
-    try {
-      const foundUser = await User.findOne({ email: req.body.email });
+  try {
+    const foundUser = await User.findOne({ email: req.body.email });
 
-      if (foundUser !== null) {
-        res
-          .status(400)
-          .json({
-            errorMessage:
-              "There is already an account created with that email address.", //* Funciona
-          });
-        return;
-      }
-      const salt = await bcrypt.genSalt(12);
-      const hashPassword = await bcrypt.hash(req.body.password, salt);
-
-      await User.create({
-        username: username,
-        email: email,
-        password: hashPassword,
-      })
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ errorMessage: "Server error" });
+    if (foundUser !== null) {
+      res.status(400).json({
+        errorMessage:
+          "There is already an account created with that email address.", //* Funciona
+      });
+      return;
     }
+    const salt = await bcrypt.genSalt(12);
+    const hashPassword = await bcrypt.hash(req.body.password, salt);
+
+    await User.create({
+      username: username,
+      email: email,
+      password: hashPassword,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMessage: "Server error" });
+  }
   //* Creación de usuario funciona y sale en la DB.
 
   res.json("Testing signup"); //* Funciona
 });
 
-
-
 // POST "/api/auth/login" => Valida las credenciales ya creadas del usuario
 
-router.post("/login", (req, res, next) => {
-  res.json("Testing login");
+router.post("/login", async (req, res, next) => {
+  console.log(req.body); // Info de las credenciales. Funciona, visualizándolas en la consola.
+  const { email, password } = req.body;
+
+  // Validación de que ambos campos estén llenos
+  if (email === "" || password === "") {
+    res.status(400).json({ errorMessage: "Both fields are required." }); // *Funciona
+    return;
+  }
+
+  // Validación de que el usuario existe
+
+  try {
+    const foundUser = await User.findOne({ email: email });
+    if (foundUser === null) {
+      res.status(400).json({
+        errorMessage:
+          "There is not an account created with that email address.",
+      });
+    }
+
+    //Validación de contraseña correcta o no
+
+   const isPasswordCorrect = await bcrypt.compare(
+    password,
+    foundUser.password)
+
+    if (isPasswordCorrect === false){
+    res.status(400).json({errorMessage: "Password is not correct, please try again."}) //* Funciona
+    return
+    }
+
+    res.json("Testing login"); //* Funciona
+  } catch (error) {
+    next(error);
+  }
 });
 
 // GET "/api/auth/verify" => Notifica al front end si el usuario ha iniciado sesión correctamente. (Validación.)

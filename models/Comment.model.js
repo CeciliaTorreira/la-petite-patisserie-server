@@ -20,3 +20,6 @@ const commentSchema = new Schema(
     timestamps: true,
   }
 );
+
+
+const Comment = model("Comment", commentSchema);
