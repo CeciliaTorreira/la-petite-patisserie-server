@@ -10,17 +10,17 @@ const router = require("express").Router();
     // Validaciones del servidor
 
     if (username === "" || email === "" || password === ""){
-    res.json({errorMessage: "All fields are required."})   // *Funciona  
-    return 
+    res.status(400).json({errorMessage: "All fields are required."})   // *Funciona  
+    return;
     }
     
     // Validación de contraseña 
 
     const regexPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm;
     if (regexPattern.test(req.body.password) === false) {
-      res.json({
+      res.status(400).json({   //* Recordar mensajes de error detallados/específicos
         errorMessage:
-          "Please keep in mind your password needs to contain at least one capital letter, one special character and a length og eight characters.",  //* Funciona
+          "Please keep in mind your password needs to contain at least one capital letter, one special character and a length of eight characters.",  //* Funciona
       })
   
       return;
