@@ -62,8 +62,52 @@ router.post("/create", isAuthenticated, async (req, res, next) => {
     
    
   } catch (error) {
-    next(error);
+    res.status(500).json({ errorMessage: "Server error, please try again later." });
   }
 });
+
+
+// GET "/api/recipes/:recipeId" => Envía al front end una unica receta segun su ID.
+
+router.get("/:recipeId", async (req, res, next) =>{
+ const { recipeId } = req.params
+ try {
+    const oneRecipe = await Recipe.findById(recipeId) // Funcionando en Postman! 
+    res.json(oneRecipe)
+ } catch (error) {
+    res.status(500).json({ errorMessage: "Server error, please try again later." });
+ }
+})
+
+
+// PUT "/api/recipes/:recipeId" => Recibe información del Front End para editar una receta
+
+router.put("/:recipeId", isAuthenticated, async (req, res, next) =>{
+  const {recipeId} = req.params;
+  const {
+    name,
+    ingredients,
+    category,
+    instructions,
+    servings,
+    picture,
+  } = req.body;
+
+  try {
+    await Recipe.findByIdAndUpdate(recipeId, {
+        name,
+        ingredients,
+        category,
+        instructions,
+        servings,
+        picture
+    })
+    res.json("Recipe has been updated!") // Funciona y el cambio se realiza en la DB
+  } catch (error) {
+    res.status(500).json({ errorMessage: "Server error, please try again later." });
+  }
+
+})
+
 
 module.exports = router;
