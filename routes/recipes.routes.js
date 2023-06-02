@@ -110,4 +110,22 @@ router.put("/:recipeId", isAuthenticated, async (req, res, next) =>{
 })
 
 
+// DELETE "/api/recipes/:recipeId" => Borra una receta específica de la base de datos.
+ 
+router.delete("/:recipeId", isAuthenticated, async (req, res, next) =>{
+const {recipeId} = req.params
+
+try {
+    await Recipe.findByIdAndDelete(recipeId)  // Funciona y es eliminada de la base de datos.
+    res.json("Recipe has been deleted")
+} catch (error) {
+    res.status(500).json({ errorMessage: "Server error, please try again later." });
+}
+ 
+})
+
+
+// PENDIENTES RUTAS DE COMENTARIOS EN RECETAS Y PARA AñADIR RECETAS A FAVORITOS
+
+
 module.exports = router;
