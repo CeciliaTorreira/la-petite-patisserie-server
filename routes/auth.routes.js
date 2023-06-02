@@ -63,8 +63,7 @@ router.post("/signup", async (req, res, next) => {
       password: hashPassword,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ errorMessage: "Server error" });
+        next(error)
   }
   //* Creación de usuario funciona y sale en la DB.
 

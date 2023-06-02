@@ -16,3 +16,8 @@ router.use("/auth", authRouter);
 
 const recipesRouter = require("./recipes.routes.js")
 router.use("/recipes", recipesRouter)
+
+// RUTAS DE PERFIL
+
+const profileRouter = require("./profile.routes.js")
+router.use("/profile", profileRouter )
