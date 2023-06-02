@@ -3,7 +3,7 @@ const router = require("express").Router();
 //* Modelos importados
 const Recipe = require("../models/Recipe.model");
 const User = require("../models/User.model"); // Modelo de User importado para cuando quiera asociar una receta a un usuario
-const Comment = require("../models/Comment.model")
+const Comment = require("../models/Comment.model");
 
 //* Middlewares
 const isAuthenticated = require("../middlewares/isAuthenticated");
@@ -49,7 +49,7 @@ router.post("/create", isAuthenticated, async (req, res, next) => {
       ingredients,
       category,
       instructions,
-      creator: req.payload._id, // En la DB se crea perfectamente y asigna su creador como el usuario activo!! :)
+      creator: req.payload._id, // En la DB se crea perfectamente y asigna su creador como el usuario activo!!
       servings,
       picture,
     });
@@ -106,8 +106,6 @@ router.delete("/:recipeId", isAuthenticated, async (req, res, next) => {
   }
 });
 
-// PENDIENTES RUTAS DE COMENTARIOS EN RECETAS Y PARA AñADIR RECETAS A FAVORITOS
-
 // POST "/api/recipes/:recipeId/favourite" => Añade una receta a favouriteRecipes del usuario activo
 
 router.post("/:recipeId/favourite", isAuthenticated, async (req, res, next) => {
@@ -129,55 +127,45 @@ router.post("/:recipeId/favourite", isAuthenticated, async (req, res, next) => {
   }
 });
 
-
-// COMENTARIOS EN RECETAS
-
+//* COMENTARIOS EN RECETAS
 
 // GET "/api/recipes/:recipeId/comments" => Se envían al FE los comentarios que haya en una receta
 
-router.get("/:recipeId/comments", async (req, res, next)=>{
- const { recipeId } = req.params
+router.get("/:recipeId/comments", async (req, res, next) => {
+  const { recipeId } = req.params;
 
- try {
-    const recipeComments = await Comment.find({recipe: recipeId})  // Buscamos comentarios hechos únicamente sobre la receta con dicho ID específico (recipeId) 
+  try {
+    const recipeComments = await Comment.find({ recipe: recipeId }); // Buscamos comentarios hechos únicamente sobre la receta con dicho ID específico (recipeId)
     console.log(recipeComments); // [ ] No tenemos ni un único comentario todavía, creo que si al menos me devuelve un array vacío es porue está bien
-    res.json(recipeComments)    //! Actualizado, ahora sale en la búsqueda el comentario que creé con la siguiente ruta
- } catch (error) {
-    next(error)
- }
-
-})
-
+    res.json(recipeComments); //! Actualizado, ahora sale en la búsqueda el comentario que creé con la siguiente ruta
+  } catch (error) {
+    next(error);
+  }
+});
 
 // POST "/api/recipes/:recipeId/comments" => Se reciben los datos del FE para crear un nuevo comentario y añadirlo a la base de datos
 
- router.post("/:recipeId/comments", isAuthenticated, async(req, res, next)=>{
-const {recipeId} = req.params
-const {description, rating} = req.body
+router.post("/:recipeId/comments", isAuthenticated, async (req, res, next) => {
+  const { recipeId } = req.params;
+  const { description, rating } = req.body;
   try {
     if (!description || rating === 0) {
-        res.status(400).json({
-            errorMessage: "Some mandatory fields are empty, please try again.",
-          })
+      res.status(400).json({
+        errorMessage: "Some mandatory fields are empty, please try again.",
+      });
 
-          return;
+      return;
     }
     await Comment.create({
-    description,
-    rating,
-    creator: req.payload._id, // Funciona, se agrega el comentario a la receta con creator: Id del usuario activo
-    recipe: recipeId          // Funciona igualmente y se crea un comentario con recipe: id de la receta pertinente sobre la que comentamos
-    })
-    res.json("Comment posted")
-
-
+      description,
+      rating,
+      creator: req.payload._id, // Funciona, se agrega el comentario a la receta con creator: Id del usuario activo
+      recipe: recipeId, // Funciona igualmente y se crea un comentario con recipe: id de la receta pertinente sobre la que comentamos
+    });
+    res.json("Comment posted");
   } catch (error) {
-    next(error)
+    next(error);
   }
-
-
-})
- 
-
+});
 
 module.exports = router;

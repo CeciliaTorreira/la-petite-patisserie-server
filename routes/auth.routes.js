@@ -10,11 +10,11 @@ const bcrypt = require("bcrypt");
 
 // Requerimos jsonwebtoken
 
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
 // Requerimos middleware isAuthenticated
 
-const isAuthenticated = require("../middlewares/isAuthenticated")
+const isAuthenticated = require("../middlewares/isAuthenticated");
 
 // POST "/api/auth/signup" => Registra al usuario creando sus credenciales
 router.post("/signup", async (req, res, next) => {
@@ -63,7 +63,7 @@ router.post("/signup", async (req, res, next) => {
       password: hashPassword,
     });
   } catch (error) {
-        next(error)
+    next(error);
   }
   //* Creación de usuario funciona y sale en la DB.
 
@@ -95,34 +95,35 @@ router.post("/login", async (req, res, next) => {
 
     //Validación de contraseña correcta o no
 
-   const isPasswordCorrect = await bcrypt.compare(
-    password,
-    foundUser.password)
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      foundUser.password
+    );
 
-    if (isPasswordCorrect === false){
-    res.status(400).json({errorMessage: "Password is not correct, please try again."}) //* Funciona
-    return
+    if (isPasswordCorrect === false) {
+      res
+        .status(400)
+        .json({ errorMessage: "Password is not correct, please try again." }); //* Funciona
+      return;
     }
-   
+
     //* Tenemos que crear el token y enviarlo al cliente.
     //* PAYLOAD = INFORMACION DE LOGIN
     const payload = {
-     _id: foundUser._id,
-     email: foundUser.email,
-     role: foundUser.role, 
-    username: foundUser.username,
-    
-        }
-    
-   const authToken = jwt.sign(
-    payload, // Información del usuario
-    process.env.TOKEN_SECRET,  // Plabra secreta
-     {algorithm: "HS256", expiresIn: "7d" }        // Configuraciones (algoritmo y expiración (opcional))
-    
-    )
+      _id: foundUser._id,
+      email: foundUser.email,
+      role: foundUser.role,
+      username: foundUser.username,
+    };
+
+    const authToken = jwt.sign(
+      payload, // Información del usuario
+      process.env.TOKEN_SECRET, // Plabra secreta
+      { algorithm: "HS256", expiresIn: "7d" } // Configuraciones (algoritmo y expiración (opcional))
+    );
 
     // res.json("Testing login")
-    res.json({authToken: authToken}); //* Funciona
+    res.json({ authToken: authToken }); //* Funciona
   } catch (error) {
     next(error);
   }
@@ -130,18 +131,15 @@ router.post("/login", async (req, res, next) => {
 
 // GET "/api/auth/verify" => Notifica al front end si el usuario ha iniciado sesión correctamente. (Validación.)
 
- router.get("/verify", isAuthenticated , (req, res, next) =>{ // => Recibe y valida el token => extrae el payload //! PASAMOS ISAUTHENTICATED COMO ARGUMENTO
-   
+router.get("/verify", isAuthenticated, (req, res, next) => {
+  // => Recibe y valida el token => extrae el payload //! PASAMOS ISAUTHENTICATED COMO ARGUMENTO
 
   // req.payload = Usuario haciendo la llamada (recordar req.session.activeUser del módulo 2)
-console.log(req.payload); //! Usar req.payload.role para funciones de solo admin????
- res.json({payload: req.payload}) 
-
-})
-
+  console.log(req.payload); //! Usar req.payload.role para funciones de solo admin????
+  res.json({ payload: req.payload });
+});
 
 module.exports = router;
 
-
 //! DESCARGAMOS JSONWEBTOKEN Y REQUERIRLO
-//! DESCARGAMOS EXPRESS-JWT 
+//! DESCARGAMOS EXPRESS-JWT

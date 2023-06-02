@@ -8,16 +8,15 @@ module.exports = router;
 
 // RUTAS AUTH
 
-const authRouter = require("./auth.routes.js")
+const authRouter = require("./auth.routes.js");
 router.use("/auth", authRouter);
 
+// RUTAS DE RECETAS
 
-// RUTAS DE RECETAS 
-
-const recipesRouter = require("./recipes.routes.js")
-router.use("/recipes", recipesRouter)
+const recipesRouter = require("./recipes.routes.js");
+router.use("/recipes", recipesRouter);
 
 // RUTAS DE PERFIL
 
-const profileRouter = require("./profile.routes.js")
-router.use("/profile", profileRouter )
+const profileRouter = require("./profile.routes.js");
+router.use("/profile", profileRouter);
