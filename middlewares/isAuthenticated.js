@@ -11,7 +11,7 @@ const isAuthenticated = jwt({
 
     if (req.headers === undefined || req.headers.authorization === undefined) {
       console.log("No token");
-      return null;
+      return null;paylo
     }
     const tokenArr = req.headers.authorization.split(" ");
     const tokenType = tokenArr[0];

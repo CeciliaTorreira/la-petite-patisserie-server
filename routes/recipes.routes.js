@@ -7,6 +7,8 @@ const Comment = require("../models/Comment.model");
 
 //* Middlewares
 const isAuthenticated = require("../middlewares/isAuthenticated");
+const isAdmin = require("../middlewares/isAdmin")
+
 
 // GET "/api/recipes" => Envían al front end todas las recetas, mostrando nombre (añadiré más según como se vean en el FE)
 
@@ -95,7 +97,7 @@ router.put("/:recipeId", isAuthenticated, async (req, res, next) => {
 
 // DELETE "/api/recipes/:recipeId" => Borra una receta específica de la base de datos.
 
-router.delete("/:recipeId", isAuthenticated, async (req, res, next) => {
+router.delete("/:recipeId", isAuthenticated, isAdmin, async (req, res, next) => {
   const { recipeId } = req.params;
 
   try {
@@ -168,4 +170,5 @@ router.post("/:recipeId/comments", isAuthenticated, async (req, res, next) => {
   }
 });
 
+// DELETE 
 module.exports = router;
