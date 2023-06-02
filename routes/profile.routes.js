@@ -44,4 +44,26 @@ router.get("/created", isAuthenticated, async (req, res, next) => {
   }
 });
 
+// POST "/api/profile/favourite/:recipeId"
+
+router.post(
+  "/favourite/:recipeId",
+  isAuthenticated,
+  async (req, res, next) => {
+    const { recipeId } = req.params;
+
+    try {
+      //! No quiero borrar la receta, quiero sacarla del array que sería favouriteRecipes del usuario activo
+      //Fallo solucionado ^^^^
+      await User.findByIdAndUpdate(
+        req.payload._id,
+        { $pull: { favouriteRecipes: recipeId } },
+        { new: true }
+      );
+      res.json("Recipe has been removed from your favourite list") // Funciona
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 module.exports = router;
