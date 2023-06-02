@@ -178,12 +178,12 @@ router.post("/:recipeId/comments", isAuthenticated, async (req, res, next) => {
 
 router.delete(
   "/:recipeId/comments/:commentId",
-  isAuthenticated,
+  isAuthenticated, isAdmin,
   async (req, res, next) => {
-    const { recipeId, commentId } = req.params;
+    const { commentId } = req.params;
 
     try {
-      await Recipe.findById(recipeId); //!! No estoy segura de si es necesario esto o no o solo necesitamos el Id del comentario aunque éste esté en la página de esta receta
+     
       await Comment.findByIdAndDelete(commentId);
 
       res.json("The comment has been deleted"); // Funciona
