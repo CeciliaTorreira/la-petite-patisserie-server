@@ -7,8 +7,7 @@ const Comment = require("../models/Comment.model");
 
 //* Middlewares
 const isAuthenticated = require("../middlewares/isAuthenticated");
-const isAdmin = require("../middlewares/isAdmin")
-
+const isAdmin = require("../middlewares/isAdmin");
 
 // GET "/api/recipes" => Envían al front end todas las recetas, mostrando nombre (añadiré más según como se vean en el FE)
 
@@ -97,16 +96,21 @@ router.put("/:recipeId", isAuthenticated, async (req, res, next) => {
 
 // DELETE "/api/recipes/:recipeId" => Borra una receta específica de la base de datos.
 
-router.delete("/:recipeId", isAuthenticated, isAdmin, async (req, res, next) => {
-  const { recipeId } = req.params;
+router.delete(
+  "/:recipeId",
+  isAuthenticated,
+  isAdmin,
+  async (req, res, next) => {
+    const { recipeId } = req.params;
 
-  try {
-    await Recipe.findByIdAndDelete(recipeId); // Funciona y es eliminada de la base de datos.
-    res.json("Recipe has been deleted");
-  } catch (error) {
-    next(error);
+    try {
+      await Recipe.findByIdAndDelete(recipeId); // Funciona y es eliminada de la base de datos.
+      res.json("Recipe has been deleted");
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // POST "/api/recipes/:recipeId/favourite" => Añade una receta a favouriteRecipes del usuario activo
 
@@ -170,5 +174,23 @@ router.post("/:recipeId/comments", isAuthenticated, async (req, res, next) => {
   }
 });
 
-// DELETE 
+// DELETE "/api/profile/favourite" => Elimina una receta de la lista de recetas favoritas de un usuario
+
+router.delete(
+  "/:recipeId/comments/:commentId",
+  isAuthenticated,
+  async (req, res, next) => {
+    const { recipeId, commentId } = req.params;
+
+    try {
+      await Recipe.findById(recipeId); //!! No estoy segura de si es necesario esto o no o solo necesitamos el Id del comentario aunque éste esté en la página de esta receta
+      await Comment.findByIdAndDelete(commentId);
+
+      res.json("The comment has been deleted"); // Funciona
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 module.exports = router;
