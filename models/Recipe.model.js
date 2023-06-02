@@ -31,6 +31,10 @@ const recipeSchema = new Schema(
       type: Number,
       required: true,
     },
+    picture: {
+    type: String,
+    required: true
+  }
   },
   {
     timestamps: true,
@@ -38,3 +42,5 @@ const recipeSchema = new Schema(
 );
 
 const Recipe = model("Recipe", recipeSchema);
+
+module.exports = Recipe;

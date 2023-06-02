@@ -10,3 +10,9 @@ module.exports = router;
 
 const authRouter = require("./auth.routes.js")
 router.use("/auth", authRouter);
+
+
+// RUTAS DE RECETAS 
+
+const recipesRouter = require("./recipes.routes.js")
+router.use("/recipes", recipesRouter)
