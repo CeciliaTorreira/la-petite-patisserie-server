@@ -11,7 +11,7 @@ const isAdmin = require("../middlewares/isAdmin");
 
 // GET "/api/recipes" => Envían al front end todas las recetas, mostrando nombre (añadiré más según como se vean en el FE)
 
-router.get("/", isAuthenticated, async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
     const allRecipes = await Recipe.find().select({ name: 1, picture: 1 });
     // console.log(allRecipes) // Funciona
@@ -149,7 +149,7 @@ router.post(
         { $pull: { favouriteRecipes: recipeId } },
         { new: true }
       );
-      res.json("Recipe has been removed from your favourite list") // Funciona
+      res.json("Recipe has been removed from your favourite list"); // Funciona
     } catch (error) {
       next(error);
     }
@@ -164,7 +164,8 @@ router.get("/:recipeId/comments", async (req, res, next) => {
   const { recipeId } = req.params;
 
   try {
-    const recipeComments = await Comment.find({ recipe: recipeId }); // Buscamos comentarios hechos únicamente sobre la receta con dicho ID específico (recipeId)
+    const recipeComments = await Comment.find({ recipe: recipeId }) // Buscamos comentarios hechos únicamente sobre la receta con dicho ID específico (recipeId)
+      .populate("creator");
     console.log(recipeComments); // [ ] No tenemos ni un único comentario todavía, creo que si al menos me devuelve un array vacío es porue está bien
     res.json(recipeComments); //! Actualizado, ahora sale en la búsqueda el comentario que creé con la siguiente ruta
   } catch (error) {
@@ -197,7 +198,19 @@ router.post("/:recipeId/comments", isAuthenticated, async (req, res, next) => {
   }
 });
 
-// DELETE "/api/profile/favourite" => Elimina una receta de la lista de recetas favoritas de un usuario
+// // GET "/api/recipes/:recipeId/comments/:commentId" => Envía al front end una comentario segun su ID
+
+// router.get("/:recipeId/comments/:commentId", async (req, res, next) => {
+//   const { recipeId, commentId } = req.params;
+//   try {
+//     const oneComment = await Comment.findById(commentId);
+//     res.json(oneComment);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+// DELETE "/api/recipes/:recipeId/comments/:commentId" => Elimina un comentario por su ID
 
 router.delete(
   "/:recipeId/comments/:commentId",
