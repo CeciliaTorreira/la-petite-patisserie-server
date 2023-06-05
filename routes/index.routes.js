@@ -20,3 +20,5 @@ router.use("/recipes", recipesRouter);
 
 const profileRouter = require("./profile.routes.js");
 router.use("/profile", profileRouter);
+
+module.exports = router;

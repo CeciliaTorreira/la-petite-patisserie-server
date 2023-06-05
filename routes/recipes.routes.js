@@ -13,7 +13,7 @@ const isAdmin = require("../middlewares/isAdmin");
 
 router.get("/", isAuthenticated, async (req, res, next) => {
   try {
-    const allRecipes = await Recipe.find().select({ name: 1 });
+    const allRecipes = await Recipe.find().select({ name: 1, picture: 1 });
     // console.log(allRecipes) // Funciona
     console.log(req.payload);
     res.json(allRecipes); // Array vacío + recetas de prueba salen al probar la ruta
@@ -133,6 +133,29 @@ router.post("/:recipeId/favourite", isAuthenticated, async (req, res, next) => {
   }
 });
 
+// POST "/api/recipes/:recipeId/remove"
+
+router.post(
+  "/:recipeId/favourite/remove",
+  isAuthenticated,
+  async (req, res, next) => {
+    const { recipeId } = req.params;
+
+    try {
+      //! No quiero borrar la receta, quiero sacarla del array que sería favouriteRecipes del usuario activo
+      //Fallo solucionado ^^^^
+      await User.findByIdAndUpdate(
+        req.payload._id,
+        { $pull: { favouriteRecipes: recipeId } },
+        { new: true }
+      );
+      res.json("Recipe has been removed from your favourite list") // Funciona
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 //* COMENTARIOS EN RECETAS
 
 // GET "/api/recipes/:recipeId/comments" => Se envían al FE los comentarios que haya en una receta
@@ -178,12 +201,12 @@ router.post("/:recipeId/comments", isAuthenticated, async (req, res, next) => {
 
 router.delete(
   "/:recipeId/comments/:commentId",
-  isAuthenticated, isAdmin,
+  isAuthenticated,
+  isAdmin,
   async (req, res, next) => {
     const { commentId } = req.params;
 
     try {
-     
       await Comment.findByIdAndDelete(commentId);
 
       res.json("The comment has been deleted"); // Funciona
