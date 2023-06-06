@@ -21,4 +21,10 @@ router.use("/recipes", recipesRouter);
 const profileRouter = require("./profile.routes.js");
 router.use("/profile", profileRouter);
 
+//UPLOAD
+
+const uploadRoutes = require("./upload.routes");
+router.use("/upload", uploadRoutes);
+
+
 module.exports = router;
