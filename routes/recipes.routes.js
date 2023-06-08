@@ -13,7 +13,7 @@ const isAdmin = require("../middlewares/isAdmin");
 
 router.get("/", async (req, res, next) => {
   try {
-    const allRecipes = await Recipe.find().select({ name: 1, picture: 1 });
+    const allRecipes = await Recipe.find().select({ name: 1, picture: 1, category: 1 });
     // console.log(allRecipes) // Funciona
     console.log(req.payload);
     res.json(allRecipes); // Array vacío + recetas de prueba salen al probar la ruta
@@ -118,7 +118,20 @@ router.post("/:recipeId/favourite", isAuthenticated, async (req, res, next) => {
   const { recipeId } = req.params;
 
   try {
-    //Primero intenté usar findOne pero si estamos logeados podemos encontrar el usuario con req.payload.id y usar updateById mejor??
+    
+    const user = await User.findOne({
+      _id: req.payload._id,
+      favouriteRecipes: { $in: [recipeId] }  // Quiero encontrar en la base de datos si hay un usuario que tenga en sus recetas favoritas la receta con el mismo ID 
+    });                                      //que podria intentar volver a agregar a favoritos
+    
+ //Quiero que un usuario no pueda agregar repetidas veces la misma receta a favouritos
+     
+     if (user){
+      res.status(400).json({
+        errorMessage: "You have already added this recipe to your favourite list.",
+      });
+      return
+    }
     const addToFavourites = await User.findByIdAndUpdate(
       req.payload._id,
       { $push: { favouriteRecipes: recipeId } }, //! NO método de push, etc normal de JS

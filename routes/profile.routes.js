@@ -11,9 +11,9 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 router.get("/", isAuthenticated, async (req, res, next) => {
   try {
     console.log(req.payload._id);
-    await User.findById(req.payload._id);
+    const user = await User.findById(req.payload._id);
 
-    res.json("User data obtained");
+    res.json(user);
   } catch (error) {
     next(error);
   }

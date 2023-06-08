@@ -114,6 +114,7 @@ router.post("/login", async (req, res, next) => {
       email: foundUser.email,
       role: foundUser.role,
       username: foundUser.username,
+      favouriteRecipes: foundUser.favouriteRecipes
     };
 
     const authToken = jwt.sign(
