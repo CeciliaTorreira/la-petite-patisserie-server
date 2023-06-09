@@ -14,7 +14,7 @@ La Petite Patisserie is a really simple app where people can check pastry relate
 Apart from the simple functionalities the app already has, I would like to add a "copy recipe" functionality so users can copy and adapt a specific recipe to their liking.
 A friend system. Users would be able to search for friends and add them to a list so they can easily check what their friends are uploading or commenting.
 
-## Technologies user
+## Technologies used
 
 HTML, CSS, JavaScript, Express, React, React Context, Axios
 
