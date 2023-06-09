@@ -10,7 +10,6 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 
 router.get("/", isAuthenticated, async (req, res, next) => {
   try {
-    console.log(req.payload._id);
     const user = await User.findById(req.payload._id);
 
     res.json(user);
@@ -26,8 +25,7 @@ router.get("/favourite", isAuthenticated, async (req, res, next) => {
     const userFavouriteRecipes = await User.findById(req.payload._id).populate(
       "favouriteRecipes"
     );
-    res.json(userFavouriteRecipes.favouriteRecipes); // Funciona y me muestra un array vacío [ ] al no tener recetas favoritas
-    // Metí usando Mongo un objeto en favoritos del usuario que tengo activo y ahora muestra ese item correctamente
+    res.json(userFavouriteRecipes.favouriteRecipes);
   } catch (error) {
     next(error);
   }
@@ -38,7 +36,7 @@ router.get("/favourite", isAuthenticated, async (req, res, next) => {
 router.get("/created", isAuthenticated, async (req, res, next) => {
   try {
     const createdRecipes = await Recipe.find({ creator: req.payload._id });
-    res.json(createdRecipes); // Funciona y muestra las dos recetas creadas de pruebas
+    res.json(createdRecipes);
   } catch (error) {
     next(error);
   }

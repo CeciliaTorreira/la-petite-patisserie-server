@@ -4,14 +4,13 @@ const { expressjwt: jwt } = require("express-jwt");
 const isAuthenticated = jwt({
   secret: process.env.TOKEN_SECRET, //! .ENV
   algorithms: ["HS256"],
-  requestProperty: "payload", // Así recibimos el payload tras validar el token
+  requestProperty: "payload", 
   getToken: (req) => {
-    console.log(req.headers); // Error al no recibir token. Insertar bearer token en Postman para verificar
-    //* Recibiendo Bearer + token correctamente
+    console.log(req.headers); 
 
     if (req.headers === undefined || req.headers.authorization === undefined) {
       console.log("No token");
-      return null;paylo
+      return null
     }
     const tokenArr = req.headers.authorization.split(" ");
     const tokenType = tokenArr[0];
@@ -21,7 +20,7 @@ const isAuthenticated = jwt({
       console.log("Incorrect token type");
       return null;
     }
-    console.log("Token entregado"); //* Funciona
+    console.log("Token entregado");
     return token;
   },
 });

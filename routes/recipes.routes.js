@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 //* Modelos importados
 const Recipe = require("../models/Recipe.model");
-const User = require("../models/User.model"); // Modelo de User importado para cuando quiera asociar una receta a un usuario
+const User = require("../models/User.model");
 const Comment = require("../models/Comment.model");
 
 //* Middlewares
@@ -13,12 +13,14 @@ const isAdmin = require("../middlewares/isAdmin");
 
 router.get("/", async (req, res, next) => {
   try {
-    const allRecipes = await Recipe.find().select({ name: 1, picture: 1, category: 1 });
-    // console.log(allRecipes) // Funciona
-    console.log(req.payload);
-    res.json(allRecipes); // Array vacío + recetas de prueba salen al probar la ruta
+    const allRecipes = await Recipe.find().select({
+      name: 1,
+      picture: 1,
+      category: 1,
+    });
+
+    res.json(allRecipes);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });
@@ -28,7 +30,7 @@ router.get("/", async (req, res, next) => {
 router.post("/create", isAuthenticated, async (req, res, next) => {
   const { name, ingredients, category, instructions, servings, picture } =
     req.body;
-  //   console.log(req.payload);
+
   try {
     if (
       !name ||
@@ -50,7 +52,7 @@ router.post("/create", isAuthenticated, async (req, res, next) => {
       ingredients,
       category,
       instructions,
-      creator: req.payload._id, // En la DB se crea perfectamente y asigna su creador como el usuario activo!!
+      creator: req.payload._id,
       servings,
       picture,
     });
@@ -65,7 +67,7 @@ router.post("/create", isAuthenticated, async (req, res, next) => {
 router.get("/:recipeId", async (req, res, next) => {
   const { recipeId } = req.params;
   try {
-    const oneRecipe = await Recipe.findById(recipeId); // Funcionando en Postman!
+    const oneRecipe = await Recipe.findById(recipeId);
     res.json(oneRecipe);
   } catch (error) {
     next(error);
@@ -88,7 +90,7 @@ router.put("/:recipeId", isAuthenticated, async (req, res, next) => {
       servings,
       picture,
     });
-    res.json("Recipe has been updated!"); // Funciona y el cambio se realiza en la DB
+    res.json("Recipe has been updated!");
   } catch (error) {
     next(error);
   }
@@ -104,7 +106,7 @@ router.delete(
     const { recipeId } = req.params;
 
     try {
-      await Recipe.findByIdAndDelete(recipeId); // Funciona y es eliminada de la base de datos.
+      await Recipe.findByIdAndDelete(recipeId);
       res.json("Recipe has been deleted");
     } catch (error) {
       next(error);
@@ -118,24 +120,22 @@ router.post("/:recipeId/favourite", isAuthenticated, async (req, res, next) => {
   const { recipeId } = req.params;
 
   try {
-    
     const user = await User.findOne({
       _id: req.payload._id,
-      favouriteRecipes: { $in: [recipeId] }  // Quiero encontrar en la base de datos si hay un usuario que tenga en sus recetas favoritas la receta con el mismo ID 
-    });                                      //que podria intentar volver a agregar a favoritos
-    
- //Quiero que un usuario no pueda agregar repetidas veces la misma receta a favouritos
-     
-     if (user){
+      favouriteRecipes: { $in: [recipeId] },
+    });
+
+    if (user) {
       res.status(400).json({
-        errorMessage: "You have already added this recipe to your favourite list.",
+        errorMessage:
+          "You have already added this recipe to your favourite list.",
       });
-      return
+      return;
     }
     const addToFavourites = await User.findByIdAndUpdate(
       req.payload._id,
       { $push: { favouriteRecipes: recipeId } }, //! NO método de push, etc normal de JS
-      { new: true } // Documento actualizado
+      { new: true }
     );
     res
       .status(200)
@@ -155,8 +155,6 @@ router.post(
     const { recipeId } = req.params;
 
     try {
-      //! No quiero borrar la receta, quiero sacarla del array que sería favouriteRecipes del usuario activo
-      //Fallo solucionado ^^^^
       await User.findByIdAndUpdate(
         req.payload._id,
         { $pull: { favouriteRecipes: recipeId } },
@@ -177,9 +175,10 @@ router.get("/:recipeId/comments", async (req, res, next) => {
   const { recipeId } = req.params;
 
   try {
-    const recipeComments = await Comment.find({ recipe: recipeId }) // Buscamos comentarios hechos únicamente sobre la receta con dicho ID específico (recipeId)
-      .populate("creator");
-    console.log(recipeComments); // [ ] No tenemos ni un único comentario todavía, creo que si al menos me devuelve un array vacío es porue está bien
+    const recipeComments = await Comment.find({ recipe: recipeId }).populate(
+      "creator"
+    );
+
     res.json(recipeComments); //! Actualizado, ahora sale en la búsqueda el comentario que creé con la siguiente ruta
   } catch (error) {
     next(error);
@@ -202,26 +201,14 @@ router.post("/:recipeId/comments", isAuthenticated, async (req, res, next) => {
     await Comment.create({
       description,
       rating,
-      creator: req.payload._id, // Funciona, se agrega el comentario a la receta con creator: Id del usuario activo
-      recipe: recipeId, // Funciona igualmente y se crea un comentario con recipe: id de la receta pertinente sobre la que comentamos
+      creator: req.payload._id,
+      recipe: recipeId,
     });
     res.json("Comment posted");
   } catch (error) {
     next(error);
   }
 });
-
-// // GET "/api/recipes/:recipeId/comments/:commentId" => Envía al front end una comentario segun su ID
-
-// router.get("/:recipeId/comments/:commentId", async (req, res, next) => {
-//   const { recipeId, commentId } = req.params;
-//   try {
-//     const oneComment = await Comment.findById(commentId);
-//     res.json(oneComment);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
 // DELETE "/api/recipes/:recipeId/comments/:commentId" => Elimina un comentario por su ID
 
@@ -235,7 +222,7 @@ router.delete(
     try {
       await Comment.findByIdAndDelete(commentId);
 
-      res.json("The comment has been deleted"); // Funciona
+      res.json("The comment has been deleted");
     } catch (error) {
       next(error);
     }
